@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>noxelia · Ciudadanía digital</title>
+<style>
+:root{--bg:#f4f7fb;--card:#ffffff;--text:#1d2433;--muted:#5b6478;--primary:#5b4bdb;--ok:#1f9d55;--bad:#d64545;--warn:#e0a100;--shadow:0 6px 20px rgba(0,0,0,.08);--radius:16px}
+body.dark{--bg:#121621;--card:#1c2231;--text:#eef1f8;--muted:#a7afc2;--primary:#8f83ff;--shadow:0 6px 20px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+header{background:linear-gradient(135deg,#5b4bdb,#2bb5c8);color:#fff;padding:14px 18px;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;max-width:1000px;margin:auto}
+.logo{font-size:1.5rem;font-weight:800;letter-spacing:.5px}
+nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+nav button{background:rgba(255,255,255,.18);color:#fff;border:0;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:.9rem}
+nav button.active{background:#fff;color:var(--primary);font-weight:700}
+main{max-width:1000px;margin:auto;padding:20px}
+section{display:none}
+section.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+h1{font-size:1.9rem;margin:.2em 0}
+h2{font-size:1.4rem;margin:.2em 0 .6em}
+h3{margin:.3em 0 .4em}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.hero{text-align:center;padding:32px 20px}
+.btn{background:var(--primary);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-size:1rem;cursor:pointer;font-weight:600;margin:4px}
+.btn.secondary{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.btn.yes{background:var(--ok)}
+.btn.no{background:var(--bad)}
+.muted{color:var(--muted)}
+.tip{border-left:5px solid var(--primary);padding:10px 14px;background:rgba(91,75,219,.08);border-radius:10px;margin:10px 0}
+.progress{height:10px;background:rgba(127,127,127,.2);border-radius:99px;overflow:hidden;margin:10px 0}
+.progress div{height:100%;background:var(--primary);width:0;transition:width .3s}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.feedback{margin-top:12px;padding:12px;border-radius:12px;display:none}
+.feedback.ok{display:block;background:rgba(31,157,85,.15);border:1px solid var(--ok)}
+.feedback.bad{display:block;background:rgba(214,69,69,.12);border:1px solid var(--bad)}
+.feedback.warn{display:block;background:rgba(224,161,0,.15);border:1px solid var(--warn)}
+.feedback strong{display:block;margin-bottom:4px;font-size:1.05rem}
+.q{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(127,127,127,.2);flex-wrap:wrap}
+.q:last-child{border-bottom:0}
+.q .txt{flex:1 1 240px}
+.q .opts button{min-width:76px}
+.q .opts button.sel{outline:3px solid var(--primary);outline-offset:2px}
+.badge{display:inline-block;padding:4px 14px;border-radius:999px;color:#fff;font-weight:700}
+.lvl-low{background:var(--ok)}
+.lvl-mid{background:var(--warn)}
+.lvl-high{background:var(--bad)}
+.hidden{display:none!important}
+ul{padding-left:20px}
+li{margin:6px 0}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:20px}
+.small{font-size:.88rem}
+
+/* ---------- Publicación tipo red social ---------- */
+.sp-wrap{max-width:420px;margin:0 auto}
+.sp-card{background:var(--card);border:1px solid rgba(127,127,127,.25);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.sp-head{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.sp-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.sp-info{flex:1;min-width:0}
+.sp-user{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-sub{font-size:.8rem;color:var(--muted)}
+.sp-plat{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(127,127,127,.18);white-space:nowrap}
+.sp-img{height:200px;display:flex;align-items:center;justify-content:center;position:relative}
+.sp-emoji{font-size:5.5rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.sp-body{padding:12px 14px 4px;font-size:1.02rem}
+.sp-loc{padding:0 14px;font-size:.85rem;color:var(--muted)}
+.sp-actions{display:flex;gap:14px;padding:10px 14px;font-size:.9rem;color:var(--muted)}
+.sp-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.sp-chip{font-size:.78rem;padding:4px 10px;border-radius:999px;background:rgba(214,69,69,.15);color:var(--bad);font-weight:700}
+.sp-chip.safe{background:rgba(31,157,85,.15);color:var(--ok)}
+.hidden-chips{display:none}
+.score-line{font-weight:700;color:var(--primary)}
+
+@media (max-width:600px){
+  h1{font-size:1.5rem}
+  .logo{font-size:1.2rem}
+  nav button{font-size:.8rem;padding:6px 10px}
+  main{padding:12px}
+  .card{padding:16px}
+  .hero{padding:20px 10px}
+  .sp-img{height:160px}
+  .sp-emoji{font-size:4.5rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="logo">noxelia</div>
+    <nav>
+      <button data-go="inicio" class="active">Inicio</button>
+      <button data-go="info">Información</button>
+      <button data-go="consejos">Consejos</button>
+      <button data-go="juego">¿Lo publico?</button>
+      <button data-go="escaner">Escáner</button>
+      <button id="btnTema" title="Cambiar tema">🌓</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ INICIO ============ -->
+<section id="inicio" class="active">
+  <div class="card hero">
+    <h1>Tu huella digital, tu decisión</h1>
+    <p class="muted">Lo que publicás hoy puede quedar en internet por años. Aprendé a cuidar tu privacidad y a publicar con responsabilidad.</p>
+    <div>
+      <button class="btn" data-go="juego">🎮 Jugar “¿Lo publico o no?”</button>
+      <button class="btn secondary" data-go="escaner">🔍 Hacer el escáner de privacidad</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>🧠 Pensá antes de publicar</h3><p class="small">Una publicación puede ser copiada, captura de pantalla o compartida sin tu permiso.</p></div>
+    <div class="card"><h3>🔒 Protegé tus datos</h3><p class="small">Contraseñas, dirección, número y ubicación son información sensible.</p></div>
+    <div class="card"><h3>🤝 Respetá a los demás</h3><p class="small">Pedí permiso antes de publicar fotos o chats de otras personas.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>Tu progreso</h3>
+    <p id="resumenGuardado" class="small muted">Todavía no hiciste ningún juego ni escáner.</p>
+    <p class="small muted">🔐 noxelia no recolecta datos personales. Solo guarda en tu navegador tu tema y tus últimos resultados, y podés borrarlos cuando quieras.</p>
+    <button class="btn secondary" id="btnBorrar">Borrar datos guardados</button>
+  </div>
+</section>
+
+<!-- ============ INFORMACIÓN ============ -->
+<section id="info">
+  <div class="card">
+    <h2>📘 Información</h2>
+    <h3>¿Qué es la ciudadanía digital?</h3>
+    <p>Es usar internet y las redes sociales de forma responsable, segura y respetuosa, sabiendo que tus acciones digitales tienen consecuencias reales.</p>
+
+    <h3>¿Qué es la huella digital?</h3>
+    <p>Es el rastro que dejás en internet: fotos, comentarios, likes, búsquedas y datos de tus cuentas. Puede influir en tu vida escolar, laboral y en tus relaciones.</p>
+
+    <h3>📱 Uso responsable de las redes sociales</h3>
+    <p>Las redes sociales permiten comunicarnos, aprender, compartir intereses y participar en comunidades. Para usarlas bien, conviene equilibrar el tiempo conectado, verificar la información antes de compartirla y tratar a los demás con respeto.</p>
+    <ul>
+      <li>Usá las redes para aprender, comunicarte y expresarte de manera positiva.</li>
+      <li>No compartas noticias, cadenas o rumores sin comprobar si son verdaderos.</li>
+      <li>Si una conversación se vuelve agresiva, no respondas con insultos: bloqueá, reportá y pedí ayuda si hace falta.</li>
+      <li>Recordá que detrás de cada perfil hay una persona y que los comentarios pueden afectar.</li>
+    </ul>
+
+    <h3>🔐 Cómo cuidar tu privacidad</h3>
+    <p>La privacidad digital consiste en decidir qué datos compartís y quién puede acceder a ellos. No hace falta publicar información personal para participar en redes.</p>
+    <ul>
+      <li>Revisá la configuración de privacidad y quién puede ver tus publicaciones, historias y lista de amigos.</li>
+      <li>Usá contraseñas largas y distintas; activá la verificación en dos pasos.</li>
+      <li>No publiques dirección, teléfono, escuela, horarios habituales ni ubicación en tiempo real.</li>
+      <li>No compartas códigos de verificación, contraseñas ni documentos por mensajes.</li>
+      <li>Revisá los permisos de las aplicaciones y quitá los que no sean necesarios.</li>
+    </ul>
+
+    <h3>✍️ Publicaciones responsables</h3>
+    <p>Publicar responsablemente es pensar en la seguridad, la verdad y el respeto antes de subir o reenviar algo. Una publicación puede copiarse o circular fuera de tu control, incluso si después la borrás.</p>
+    <ul>
+      <li><strong>Verificá:</strong> comprobá la fuente, la fecha y el contexto antes de compartir información.</li>
+      <li><strong>Pedí permiso:</strong> consultá a las personas antes de publicar sus fotos, videos, mensajes o datos.</li>
+      <li><strong>Protegé:</strong> evitá mostrar datos que permitan identificar dónde vivís, estudiás o estás ahora.</li>
+      <li><strong>Respetá:</strong> no difundas burlas, rumores, capturas privadas ni contenido para humillar.</li>
+      <li><strong>Pensá en el futuro:</strong> preguntate si estarías cómodo con que esa publicación la vea alguien fuera de tu grupo.</li>
+    </ul>
+
+    <h3>🧩 Ejemplos para aprender</h3>
+    <ul>
+      <li><strong>Más seguro:</strong> compartir un dibujo propio o recomendar un libro sin datos personales.</li>
+      <li><strong>Revisá antes:</strong> subir una selfie o una foto grupal; comprobá el fondo, la audiencia y el permiso de quienes aparecen.</li>
+      <li><strong>No compartir públicamente:</strong> una dirección, ubicación en tiempo real, contraseña, código de acceso o chat privado.</li>
+    </ul>
+    <div class="tip">💡 <strong>Antes de publicar, preguntate:</strong> ¿Es verdadero? ¿Tengo permiso? ¿Revela datos privados? ¿Puede lastimar a alguien? ¿Quién podría verlo o guardarlo?</div>
+
+    <h3>Conceptos clave</h3>
+    <ul>
+      <li><strong>Privacidad:</strong> controlar quién ve tu información y tus publicaciones.</li>
+      <li><strong>Datos personales:</strong> nombre completo, dirección, teléfono, escuela, ubicación, documentos, contraseñas.</li>
+      <li><strong>Consentimiento:</strong> permiso explícito de una persona para publicar algo que la muestre o la nombre.</li>
+      <li><strong>Grooming y sextorsión:</strong> engaños de adultos o desconocidos para obtener fotos o datos. Ante una amenaza, no respondas, guardá las pruebas y pedí ayuda a un adulto de confianza.</li>
+      <li><strong>Ciberacoso:</strong> hostigar, humillar o difundir material de otra persona de forma repetida.</li>
+    </ul>
+
+    <h3>Riesgos frecuentes</h3>
+    <ul>
+      <li>Perfiles públicos que muestran tu rutina, tu escuela o tu casa.</li>
+      <li>Compartir contraseñas o usar la misma en todas las cuentas.</li>
+      <li>Aceptar a desconocidos y dar información “para conocerse”.</li>
+      <li>Publicar fotos de otros sin permiso o burlarse de alguien en línea.</li>
+    </ul>
+
+    <div class="tip">💡 <strong>Regla de oro:</strong> si no le mostrarías esta publicación a tu abuela, a tu profe o a un futuro empleador, pensá dos veces.</div>
+  </div>
+</section>
+
+<!-- ============ CONSEJOS ============ -->
+<section id="consejos">
+  <div class="card">
+    <h2>✅ Consejos prácticos</h2>
+    <p class="muted">Tocá un consejo para ver más detalles.</p>
+  </div>
+  <div class="grid" id="gridConsejos"></div>
+</section>
+
+<!-- ============ JUEGO ============ -->
+<section id="juego">
+  <div class="card">
+    <h2>🎮 ¿Lo publico o no?</h2>
+    <p class="muted">Vas a ver publicaciones como las de Instagram o TikTok. Elegí <strong>PUBLICAR</strong> o <strong>NO PUBLICAR</strong>. Cada acierto suma 10 puntos y la app te explica por qué.</p>
+
+    <div id="juegoInicio">
+      <button class="btn" id="btnEmpezarJuego">Empezar</button>
+      <p class="small muted" id="mejorPuntaje"></p>
+    </div>
+
+    <div id="juegoPartida" class="hidden">
+      <div class="small muted" id="juegoContador"></div>
+      <div class="progress"><div id="juegoBarra"></div></div>
+      <div class="sp-wrap" id="juegoPost"></div>
+      <div class="actions" style="justify-content:center">
+        <button class="btn yes" id="btnPublicar">✅ PUBLICAR</button>
+        <button class="btn no" id="btnNo">🚫 NO PUBLICAR</button>
+      </div>
+      <div class="feedback" id="juegoFeedback"></div>
+      <div class="actions" style="justify-content:center">
+        <button class="btn hidden" id="btnSiguiente">Siguiente →</button>
+      </div>
+    </div>
+
+    <div id="juegoFin" class="hidden">
+      <h3 id="finTitulo"></h3>
+      <p id="finPuntaje"></p>
+      <div id="finRecomendaciones"></div>
+      <button class="btn" id="btnReiniciar">Jugar de nuevo</button>
+      <button class="btn secondary" data-go="escaner">Ir al escáner de privacidad</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESCÁNER DE PRIVACIDAD ============ -->
+<section id="escaner">
+  <div class="card">
+    <h2>🔍 Escáner de privacidad NOXELIA</h2>
+    <p class="muted">Marcá solamente los datos que otras personas pueden ver en tus perfiles o publicaciones. No escribas tus datos reales: el análisis se realiza en este dispositivo.</p>
+    <div class="tip"><strong>Importante:</strong> este escáner es orientativo. No se conecta a Instagram, TikTok ni WhatsApp, y no puede comprobar tu cuenta automáticamente.</div>
+    <div id="privacidadChecklist"></div>
+    <div class="actions">
+      <button class="btn" id="btnAnalizarPrivacidad">Analizar mi privacidad</button>
+      <button class="btn secondary" id="btnLimpiarPrivacidad">Desmarcar todo</button>
+    </div>
+  </div>
+  <div class="card hidden" id="privacidadResultado">
+    <h2>🚦 Tu semáforo de privacidad</h2>
+    <p><span class="badge" id="privacidadNivel"></span></p>
+    <p id="privacidadTexto"></p><p class="small muted" id="privacidadPuntaje"></p>
+    <h3>¿Cómo lo arreglo?</h3><ul id="privacidadAcciones"></ul>
+    <button class="btn secondary" id="btnVerTutoriales">Ver tutoriales de redes</button>
+  </div>
+  <div class="card" id="retoPrivacidad">
+    <h2>🎯 Reto relámpago: ¿qué harías?</h2>
+    <p class="muted">Tres situaciones cortitas para practicar. Elegí una respuesta y aprendé el motivo.</p>
+    <div class="progress"><div id="retoBarra"></div></div>
+    <p id="retoContador" class="small muted">Reto 1 de 3</p>
+    <h3 id="retoPregunta"></h3>
+    <div class="actions" id="retoOpciones"></div>
+    <div class="feedback" id="retoFeedback"></div>
+    <button class="btn hidden" id="retoSiguiente">Siguiente reto →</button>
+    <p id="retoFinal" class="tip hidden"></p>
+  </div>
+  <div class="card" id="privacidadTutoriales">
+    <h2>🛠️ Tutoriales para mejorar tu privacidad</h2>
+    <p class="muted small">Los nombres de los menús pueden cambiar según la versión de la aplicación.</p>
+    <details class="tip"><summary><strong>📸 Instagram</strong></summary><ol>
+      <li>Abrí Instagram y entrá a tu perfil.</li><li>Tocá ☰ y buscá Configuración y actividad.</li>
+      <li>Entrá en Privacidad de la cuenta y activá Cuenta privada.</li><li>En Historias, revisá quién puede verlas y responderlas.</li>
+      <li>En Etiquetas y menciones, limitá quién puede etiquetarte y activá aprobación manual si está disponible.</li><li>Revisá seguidores y quitá a quienes no conozcas.</li>
+    </ol></details>
+    <details class="tip"><summary><strong>🎵 TikTok</strong></summary><ol>
+      <li>Abrí TikTok y entrá a Perfil.</li><li>Tocá ☰ y después Ajustes y privacidad.</li><li>Entrá en Privacidad y activá Cuenta privada.</li>
+      <li>Revisá quién puede comentar, enviarte mensajes, hacer dúos o usar tus videos.</li><li>En Estado de actividad y Sincronizar contactos, desactivá lo que no quieras compartir.</li><li>Revisá tus videos y quitá información que revele escuela, dirección o rutina.</li>
+    </ol></details>
+    <details class="tip"><summary><strong>💬 WhatsApp</strong></summary><ol>
+      <li>Abrí WhatsApp y tocá Ajustes (Android: ⋮; iPhone: Configuración).</li><li>Entrá en Privacidad.</li>
+      <li>En Hora de últ. vez y En línea, elegí quién puede verlo.</li><li>Configurá Foto del perfil, Info y Estado para que los vean tus contactos o una lista elegida.</li><li>En Grupos, limitá quién puede agregarte.</li><li>Activá Silenciar llamadas de números desconocidos y revisá los dispositivos vinculados.</li>
+    </ol></details>
+    <div class="tip">🔐 Nunca compartas contraseñas ni códigos de verificación. Si alguien te presiona o amenaza, guardá las pruebas y hablá con un adulto de confianza.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>noxelia · Proyecto educativo de ciudadanía digital · Sin cuentas, sin servidores, sin recolección de datos.</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  /* ---------- Almacenamiento local seguro ---------- */
+  const Store = {
+    get(key, def) {
+      try { const v = localStorage.getItem("noxelia-" + key); return v === null ? def : JSON.parse(v); }
+      catch (e) { return def; }
+    },
+    set(key, val) {
+      try { localStorage.setItem("noxelia-" + key, JSON.stringify(val)); } catch (e) {}
+    },
+    clear() {
+      try { Object.keys(localStorage).filter(k => k.startsWith("noxelia-")).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+    }
+  };
+
+  /* ---------- Navegación entre secciones ---------- */
+  function irA(id) {
+    $$("section").forEach(s => s.classList.toggle("active", s.id === id));
+    $$("nav button[data-go]").forEach(b => b.classList.toggle("active", b.dataset.go === id));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-go]");
+    if (b) irA(b.dataset.go);
+  });
+
+  /* ---------- Tema claro/oscuro ---------- */
+  function aplicarTema(oscuro) {
+    document.body.classList.toggle("dark", oscuro);
+  }
+  aplicarTema(Store.get("tema", "claro") === "oscuro");
+  $("#btnTema").addEventListener("click", () => {
+    const oscuro = !document.body.classList.contains("dark");
+    aplicarTema(oscuro);
+    Store.set("tema", oscuro ? "oscuro" : "claro");
+  });
+
+  /* ---------- Consejos ---------- */
+  const consejos = [
+    { t: "Revisá tu privacidad", d: "Configurá tu cuenta como privada y decidí quién puede ver tus publicaciones, historias y seguidores." },
+    { t: "Contraseñas fuertes", d: "Usá frases largas y distintas para cada cuenta. Un gestor de contraseñas puede ayudarte." },
+    { t: "Activá la verificación en dos pasos", d: "Así, aunque alguien sepa tu contraseña, no podrá entrar sin el código extra." },
+    { t: "No compartas datos sensibles", d: "Evitá publicar tu dirección, tu número, tu escuela con horarios o documentos." },
+    { t: "Cuidado con la ubicación", d: "No etiquetes tu casa ni compartas ubicación en tiempo real con desconocidos." },
+    { t: "Pedí permiso", d: "Antes de publicar una foto o video donde aparezcan otras personas, preguntales." },
+    { t: "Revisá las etiquetas", d: "Activá la opción de aprobar etiquetas antes de que aparezcan en tu perfil." },
+    { t: "Aceptá solo a personas conocidas", d: "Desconfiá de perfiles sin historial, con fotos robadas o que piden datos rápido." },
+    { t: "Pensá antes de responder", d: "Si alguien te presiona, te amenaza o te pide fotos, cortá la conversación, guardá pruebas y avisá a un adulto." },
+    { t: "Dejá de lado el “que se vea”", d: "Los likes no definen tu valor. Publicar menos cosas personales también es una elección válida." },
+    { t: "Cerrá sesión en equipos compartidos", d: "En computadoras de la escuela o de otra persona, cerrá sesión y no guardes contraseñas." },
+    { t: "Revisá apps con acceso", d: "Eliminá las aplicaciones que no usás y que tienen permiso para acceder a tu cuenta." }
+  ];
+  $("#gridConsejos").innerHTML = consejos.map((c, i) =>
+    `<div class="card" style="margin:0;cursor:pointer" data-idx="${i}">
+       <h3>💡 ${c.t}</h3>
+       <p class="small muted ocultable hidden">${c.d}</p>
+       <p class="small" style="color:var(--primary)">Tocá para ver</p>
+     </div>`).join("");
+  $("#gridConsejos").addEventListener("click", (e) => {
+    const card = e.target.closest("[data-idx]");
+    if (!card) return;
+    const det = card.querySelector(".ocultable");
+    const abierto = !det.classList.contains("hidden");
+    det.classList.toggle("hidden", abierto);
+    card.querySelector("p:last-child").textContent = abierto ? "Tocá para ver" : "Tocá para ocultar";
+  });
+
+  /* ============================================================
+     JUEGO: ¿Lo publico o no?
+     Cada publicación tiene:
+     - riesgo: true => no conviene publicarla
+     - datos: datos sensibles que se resaltan al responder
+     - alerta: qué pasa si la publica (se muestra si publica algo riesgoso)
+     - explicacion: por qué es así (se muestra siempre al responder)
+     ============================================================ */
+  const PUNTOS_ACIERTO = 10;
+
+  const publicaciones = [
+    { plataforma: "Instagram", usuario: "@sofi.23", emoji: "🏫", fondo: "linear-gradient(135deg,#7f7fd5,#86a8e7,#91eae4)",
+      texto: "Estoy sola en casa 🏠 mis viejos vuelven recién a la noche. #uniforme #colegio",
+      ubicacion: "📍 Barrio Norte, a 2 cuadras del colegio",
+      riesgo: true,
+      datos: ["Tu colegio (uniforme)", "Estás sola en casa", "Tu barrio"],
+      alerta: "Acabás de compartir tu colegio y que estás sola. Cualquiera podría encontrarte.",
+      explicacion: "Eso es un dato privado: muestra dónde estudiás, dónde vivís y que no hay nadie en tu casa." },
+
+    { plataforma: "TikTok", usuario: "@tomi_gamer", emoji: "🪪", fondo: "linear-gradient(135deg,#f6d365,#fda085)",
+      texto: "Para que me creas que la cuenta es mía, te mando la foto de mi DNI 🙏",
+      ubicacion: null,
+      riesgo: true,
+      datos: ["Número de DNI", "Tu nombre completo", "Tu fecha de nacimiento"],
+      alerta: "Con tu DNI pueden robarte la identidad o abrir cuentas a tu nombre. Nunca lo compartas.",
+      explicacion: "Los documentos no se muestran ni se envían a desconocidos, aunque te pidan “verificar” algo." },
+
+    { plataforma: "Instagram", usuario: "@lau.vacas", emoji: "🏖️", fondo: "linear-gradient(135deg,#43cea2,#185a9d)",
+      texto: "Vacaciones en la casa del lago 🌊 ¡Acá no hay nadie!",
+      ubicacion: "📍 Casa del lago · compartiendo ubicación en vivo",
+      riesgo: true,
+      datos: ["Ubicación en vivo", "Casa vacía", "Tu rutina"],
+      alerta: "Mostraste dónde estás y que la casa está vacía. Eso puede atraer robos o personas que te busquen.",
+      explicacion: "Compartí tu ubicación solo con personas de confianza y por poco tiempo." },
+
+    { plataforma: "Instagram", usuario: "@mati.cc", emoji: "🎾", fondo: "linear-gradient(135deg,#a1c4fd,#c2e9fb)",
+      texto: "¡Felicitamos a Juan por ganar el torneo de tenis del club! 🎾🏆 (publicado con su permiso)",
+      ubicacion: null,
+      riesgo: false,
+      datos: [],
+      alerta: null,
+      explicacion: "Reconocer los logros de otros con permiso y buena intención construye una buena reputación digital." },
+
+    { plataforma: "TikTok", usuario: "@ana.stories", emoji: "💬", fondo: "linear-gradient(135deg,#fbc2eb,#a6c1ee)",
+      texto: "Mirá lo que me escribió Valen en privado jajaja 😂 (le saqué captura con su nombre)",
+      ubicacion: null,
+      riesgo: true,
+      datos: ["Chat privado", "Nombre de otra persona", "Sus mensajes"],
+      alerta: "Publicaste una conversación privada de otra persona sin su permiso. Puede generar un conflicto grave.",
+      explicacion: "Las conversaciones privadas son de las dos personas. Sin permiso, no se muestran." },
+
+    { plataforma: "Instagram", usuario: "@nico.fiesta", emoji: "🎉", fondo: "linear-gradient(135deg,#ff9a9e,#fad0c4)",
+      texto: "Qué noche!! 🍻 Mirá cómo está Mateo jaja (él me pidió que no la suba, pero bue)",
+      ubicacion: "📍 Salón de la calle 9",
+      riesgo: true,
+      datos: ["Foto de otra persona", "Alcohol", "Pidió que no se publique"],
+      alerta: "Subiste una foto de alguien que pidió que no la publiques, en una situación que puede traerle problemas.",
+      explicacion: "Si alguien no quiere aparecer, respetá su decisión. Lo correcto es no publicarla." },
+
+    { plataforma: "TikTok", usuario: "@cami.memes", emoji: "🤣", fondo: "linear-gradient(135deg,#f093fb,#f5576c)",
+      texto: "El profe de matemática es un inútil 🤡 que todos lo vean #colegio",
+      ubicacion: null,
+      riesgo: true,
+      datos: ["Insulto a un docente", "Nombre del colegio"],
+      alerta: "Ese video puede llegar a directivos, familias y futuros empleadores. Además puede traer sanciones.",
+      explicacion: "Criticar con insultos o burlas daña a una persona. Las críticas respetuosas sí se pueden hacer." },
+
+    { plataforma: "Instagram", usuario: "@valen.reseñas", emoji: "📺", fondo: "linear-gradient(135deg,#84fab0,#8fd3f4)",
+      texto: "Terminé la temporada 2 de mi serie favorita. El final me gustó, aunque el episodio 4 bajó un poco. ¿Y a ustedes?",
+      ubicacion: null,
+      riesgo: false,
+      datos: [],
+      alerta: null,
+      explicacion: "Opinar está bien. Mientras no haya insultos ni datos personales, es una publicación responsable." },
+
+    { plataforma: "TikTok", usuario: "@xx.gamer.xx", emoji: "🔑", fondo: "linear-gradient(135deg,#434343,#000000)",
+      texto: "Subo mi contraseña de Instagram para que mis amigos entren a mi cuenta 😅 clave: ********",
+      ubicacion: null,
+      riesgo: true,
+      datos: ["Contraseña", "Acceso a tu cuenta"],
+      alerta: "Cualquiera que vea la historia puede entrar a tu cuenta y hacerse pasar por vos.",
+      explicacion: "Nunca compartas contraseñas. Si necesitás que alguien te ayude, hacelo en persona o por un canal privado." },
+
+    { plataforma: "Instagram", usuario: "@colegio.solidario", emoji: "🤝", fondo: "linear-gradient(135deg,#ffecd2,#fcb69f)",
+      texto: "Campaña solidaria del colegio: juntamos ropa de invierno para el merendero del barrio. Todos firmaron la autorización 🧥",
+      ubicacion: null,
+      riesgo: false,
+      datos: [],
+      alerta: null,
+      explicacion: "Se publica con consentimiento y con un propósito positivo. Muy buena decisión." },
+    { plataforma: "TikTok", usuario: "@vale.dibuja", emoji: "🎨", fondo: "linear-gradient(135deg,#c3cfe2,#f5f7fa)",
+      texto: "Les muestro mi dibujo terminado. ¿Qué color le agregarían? ✨",
+      ubicacion: null, riesgo: false, datos: [], alerta: null,
+      explicacion: "Compartir una creación propia sin datos personales es una forma positiva de participar." },
+    { plataforma: "Instagram", usuario: "@max.cumple", emoji: "🎂", fondo: "linear-gradient(135deg,#fddb92,#d1fdff)",
+      texto: "¡Feliz cumple, Agus! 🎉 (subí esta foto donde aparece su dirección en la invitación)",
+      ubicacion: null, riesgo: true, datos: ["Dirección de otra persona", "Foto sin revisar"],
+      alerta: "La invitación muestra una dirección privada. No publiques la imagen hasta ocultar ese dato y tener permiso.",
+      explicacion: "Antes de compartir una foto, revisá el fondo y los detalles: pueden revelar datos aunque el texto no los mencione." },
+    { plataforma: "TikTok", usuario: "@club.lectura", emoji: "📚", fondo: "linear-gradient(135deg,#d4fc79,#96e6a1)",
+      texto: "Recomendación de libro: me encantó esta historia. ¿Cuál me recomiendan leer después?",
+      ubicacion: null, riesgo: false, datos: [], alerta: null,
+      explicacion: "Una recomendación amable y sin información privada es una publicación responsable." },
+    { plataforma: "Instagram", usuario: "@luli.ubicacion", emoji: "🗺️", fondo: "linear-gradient(135deg,#fbc2eb,#a6c1ee)",
+      texto: "Estoy esperando el colectivo en esta parada, vengan a saludarme ahora 📍",
+      ubicacion: "📍 Parada exacta · en tiempo real",
+      riesgo: true, datos: ["Ubicación en tiempo real", "Rutina"],
+      alerta: "Compartiste dónde estás en este momento. Evitá publicar ubicaciones exactas mientras seguís ahí.",
+      explicacion: "Es más seguro compartir una salida después de irte y no mostrar tu ubicación en tiempo real." }
+  ];
+
+  let mazo = [], indice = 0, puntos = 0, respondido = false;
+
+  function mezclar(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function mostrarInicioJuego() {
+    $("#juegoInicio").classList.remove("hidden");
+    $("#juegoPartida").classList.add("hidden");
+    $("#juegoFin").classList.add("hidden");
+    const mejor = Store.get("mejorJuego", null);
+    const max = publicaciones.length * PUNTOS_ACIERTO;
+    $("#mejorPuntaje").textContent = mejor === null ? "" : `Tu mejor puntaje: ${mejor} de ${max}`;
+  }
+
+  function empezarJuego() {
+    mazo = mezclar(publicaciones);
+    indice = 0; puntos = 0;
+    $("#juegoInicio").classList.add("hidden");
+    $("#juegoFin").classList.add("hidden");
+    $("#juegoPartida").classList.remove("hidden");
+    mostrarPublicacion();
+  }
+
+  function iniciales(usuario) {
+    return usuario.replace("@", "").slice(0, 2).toUpperCase();
+  }
+
+  function actualizarContador() {
+    $("#juegoContador").textContent =
+      `Publicación ${indice + 1} de ${mazo.length} · Puntaje: ${puntos}`;
+  }
+
+  function mostrarPublicacion() {
+    respondido = false;
+    const p = mazo[indice];
+    actualizarContador();
+    $("#juegoBarra").style.width = (indice / mazo.length * 100) + "%";
+
+    const cont = $("#juegoPost");
+    cont.innerHTML = "";
+
+    const card = document.createElement("div");
+    card.className = "sp-card";
+
+    // Cabecera tipo red social
+    const head = document.createElement("div");
+    head.className = "sp-head";
+    const av = document.createElement("div");
+    av.className = "sp-avatar";
+    av.textContent = iniciales(p.usuario);
+    const info = document.createElement("div");
+    info.className = "sp-info";
+    const user = document.createElement("div");
+    user.className = "sp-user";
+    user.textContent = p.usuario;
+    const sub = document.createElement("div");
+    sub.className = "sp-sub";
+    sub.textContent = "Hace " + (indice % 5 + 1) + " h";
+    info.append(user, sub);
+    const plat = document.createElement("span");
+    plat.className = "sp-plat";
+    plat.textContent = p.plataforma;
+    head.append(av, info, plat);
+
+    // Imagen simulada
+    const img = document.createElement("div");
+    img.className = "sp-img";
+    img.style.background = p.fondo;
+    const emo = document.createElement("span");
+    emo.className = "sp-emoji";
+    emo.textContent = p.emoji;
+    img.appendChild(emo);
+
+    // Texto
+    const body = document.createElement("div");
+    body.className = "sp-body";
+    const caption = document.createElement("p");
+    caption.style.margin = "0";
+    caption.textContent = p.texto;
+    body.appendChild(caption);
+
+    card.append(head, img, body);
+
+    if (p.ubicacion) {
+      const loc = document.createElement("div");
+      loc.className = "sp-loc";
+      loc.style.marginTop = "8px";
+      loc.textContent = p.ubicacion;
+      card.appendChild(loc);
+    }
+
+    const acc = document.createElement("div");
+    acc.className = "sp-actions";
+    acc.innerHTML = "<span>♡ " + (40 + indice * 17) + "</span><span>💬 " + (3 + indice * 2) + "</span><span>↗ Compartir</span>";
+    card.appendChild(acc);
+
+    // Chips de datos: se muestran al responder
+    const chips = document.createElement("div");
+    chips.className = "sp-chips hidden-chips";
+    chips.id = "spChips";
+    p.datos.forEach(d => {
+      const c = document.createElement("span");
+      c.className = "sp-chip";
+      c.textContent = "⚠️ " + d;
+      chips.appendChild(c);
+    });
+    if (p.datos.length === 0) {
+      const c = document.createElement("span");
+      c.className = "sp-chip safe";
+      c.textContent = "✅ Sin datos personales";
+      chips.appendChild(c);
+    }
+    card.appendChild(chips);
+
+    cont.appendChild(card);
+
+    $("#btnPublicar").disabled = false;
+    $("#btnNo").disabled = false;
+    const fb = $("#juegoFeedback");
+    fb.className = "feedback";
+    fb.innerHTML = "";
+    $("#btnSiguiente").classList.add("hidden");
+    $("#btnSiguiente").textContent = indice === mazo.length - 1 ? "Ver resultado" : "Siguiente →";
+  }
+
+  function responder(decisionPublicar) {
+    if (respondido) return;
+    respondido = true;
+    const p = mazo[indice];
+    const acierto = decisionPublicar === !p.riesgo;
+    if (acierto) puntos += PUNTOS_ACIERTO;
+
+    // Mostrar los datos sensibles detectados
+    const chips = $("#spChips");
+    if (chips) chips.classList.remove("hidden-chips");
+
+    const fb = $("#juegoFeedback");
+    fb.innerHTML = "";
+    const titulo = document.createElement("strong");
+    const texto = document.createElement("div");
+    texto.textContent = p.explicacion;
+
+    if (p.riesgo && !decisionPublicar) {
+      // Acierto: no publicó algo riesgoso
+      fb.className = "feedback ok";
+      titulo.textContent = "✅ Bien hecho. Eso es un dato privado.";
+      fb.append(titulo, texto);
+    } else if (p.riesgo && decisionPublicar) {
+      // Error: publicó algo riesgoso
+      fb.className = "feedback bad";
+      titulo.textContent = "🚨 ¡Cuidado! " + p.alerta;
+      fb.append(titulo, texto);
+    } else if (!p.riesgo && decisionPublicar) {
+      // Acierto: publicó algo seguro
+      fb.className = "feedback ok";
+      titulo.textContent = "✅ Buena decisión.";
+      fb.append(titulo, texto);
+    } else {
+      // Publicación segura que no se publicó
+      fb.className = "feedback warn";
+      titulo.textContent = "🙂 Podías publicarla.";
+      fb.append(titulo, texto);
+    }
+
+    actualizarContador();
+    $("#btnPublicar").disabled = true;
+    $("#btnNo").disabled = true;
+    $("#btnSiguiente").classList.remove("hidden");
+  }
+
+  function siguiente() {
+    if (indice < mazo.length - 1) {
+      indice++;
+      mostrarPublicacion();
+    } else {
+      terminarJuego();
+    }
+  }
+
+  function terminarJuego() {
+    $("#juegoPartida").classList.add("hidden");
+    $("#juegoFin").classList.remove("hidden");
+    $("#juegoBarra").style.width = "100%";
+    const total = mazo.length;
+    const aciertos = puntos / PUNTOS_ACIERTO;
+    const porc = aciertos / total;
+
+    let titulo, rec;
+    if (porc >= 0.9) {
+      titulo = "🏆 ¡Excelente criterio digital!";
+      rec = ["Seguí pensando en el impacto de cada publicación antes de subirla.",
+             "Podés ayudar a tus amigos explicándoles por qué ciertas publicaciones son riesgosas."];
+    } else if (porc >= 0.6) {
+      titulo = "👍 Muy bien, con algunos puntos para mejorar";
+      rec = ["Revisá las publicaciones que te equivocaste: suelen tener datos personales o falta de consentimiento.",
+             "Antes de publicar, preguntate: ¿quién lo puede ver?, ¿alguien sale sin permiso?, ¿revela algo mío?"];
+    } else {
+      titulo = "🌱 Vas por buen camino: a seguir practicando";
+      rec = ["Ante la duda, no publiques. Siempre podés publicarlo después.",
+             "Revisá la sección Consejos y volvé a jugar para mejorar tu criterio.",
+             "Si alguien te presiona para publicar o enviar algo, hablalo con un adulto de confianza."];
+    }
+
+    $("#finTitulo").textContent = titulo;
+    $("#finPuntaje").textContent = `Tu puntaje: ${puntos} de ${total * PUNTOS_ACIERTO} (${aciertos} de ${total} aciertos).`;
+    const ul = document.createElement("ul");
+    rec.forEach(r => { const li = document.createElement("li"); li.textContent = r; ul.appendChild(li); });
+    $("#finRecomendaciones").innerHTML = "";
+    $("#finRecomendaciones").appendChild(ul);
+
+    const mejor = Store.get("mejorJuego", null);
+    if (mejor === null || puntos > mejor) Store.set("mejorJuego", puntos);
+    Store.set("ultimoJuego", { puntaje: puntos, total: total * PUNTOS_ACIERTO, fecha: Date.now() });
+    actualizarResumen();
+  }
+
+  $("#btnEmpezarJuego").addEventListener("click", empezarJuego);
+  $("#btnPublicar").addEventListener("click", () => responder(true));
+  $("#btnNo").addEventListener("click", () => responder(false));
+  $("#btnSiguiente").addEventListener("click", siguiente);
+  $("#btnReiniciar").addEventListener("click", empezarJuego);
+
+  /* ---------- Mini reto educativo del escáner ---------- */
+  const retosPrivacidad = [
+    {q:"Un desconocido te pide tu código de WhatsApp para “verificar” tu cuenta. ¿Qué hacés?",
+     opciones:["Se lo envío","No lo comparto y bloqueo/reporto si insiste"], correcta:1,
+     explicacion:"Los códigos de verificación son secretos. Quien los obtiene puede intentar tomar control de tu cuenta."},
+    {q:"Una amiga aparece en una foto y te pide que no la publiques. ¿Qué corresponde?",
+     opciones:["La publico igual","Respeto su decisión y no la publico"], correcta:1,
+     explicacion:"El consentimiento importa. Si alguien dice que no, no compartas su imagen."},
+    {q:"Querés contar que llegaste a un lugar. ¿Cuál es la opción más segura?",
+     opciones:["Publicar ubicación exacta en vivo","Compartirlo después, sin ubicación precisa"], correcta:1,
+     explicacion:"Evitar la ubicación en tiempo real ayuda a proteger dónde estás y tus rutinas."}
+  ];
+  let retoIndice=0, retoAciertos=0, retoRespondido=false;
+  function mostrarReto(){
+    const r=retosPrivacidad[retoIndice]; retoRespondido=false;
+    $("#retoContador").textContent=`Reto ${retoIndice+1} de ${retosPrivacidad.length}`;
+    $("#retoBarra").style.width=(retoIndice/retosPrivacidad.length*100)+"%";
+    $("#retoPregunta").textContent=r.q; $("#retoOpciones").innerHTML="";
+    r.opciones.forEach((op,i)=>{const b=document.createElement("button");b.className="btn secondary";b.textContent=op;b.addEventListener("click",()=>responderReto(i));$("#retoOpciones").appendChild(b);});
+    $("#retoFeedback").className="feedback";$("#retoFeedback").textContent="";
+    $("#retoSiguiente").classList.add("hidden");$("#retoFinal").classList.add("hidden");
+  }
+  function responderReto(i){
+    if(retoRespondido)return;retoRespondido=true;const r=retosPrivacidad[retoIndice];
+    const ok=i===r.correcta;if(ok)retoAciertos++;
+    const fb=$("#retoFeedback");fb.className="feedback "+(ok?"ok":"warn");
+    fb.innerHTML="";const strong=document.createElement("strong");strong.textContent=ok?"✅ ¡Correcto!":"💡 Buena oportunidad para aprender";
+    const p=document.createElement("p");p.textContent=r.explicacion;fb.append(strong,p);
+    $("#retoOpciones").querySelectorAll("button").forEach(b=>b.disabled=true);
+    $("#retoSiguiente").textContent=retoIndice===retosPrivacidad.length-1?"Ver resultado":"Siguiente reto →";
+    $("#retoSiguiente").classList.remove("hidden");
+  }
+  $("#retoSiguiente").addEventListener("click",()=>{
+    if(retoIndice<retosPrivacidad.length-1){retoIndice++;mostrarReto();}
+    else{$("#retoBarra").style.width="100%";$("#retoPregunta").textContent="¡Reto terminado!";
+      $("#retoOpciones").innerHTML="";$("#retoFeedback").className="feedback";
+      $("#retoFinal").textContent=`Puntaje: ${retoAciertos} de ${retosPrivacidad.length}. ${retoAciertos===3?"¡Excelente criterio!": "Volvé a intentarlo y recordá: cuidá tus datos, respetá el permiso y evitá compartir tu ubicación en vivo."}`;
+      $("#retoFinal").classList.remove("hidden");$("#retoSiguiente").classList.add("hidden");retoIndice=0;retoAciertos=0;}
+  });
+  mostrarReto();
+
+  /* ---------- Escáner de privacidad: adiviná el color ---------- */
+  const datosPrivacidad = [
+    {id:"dibujo", titulo:"Compartir un dibujo o una actividad", detalle:"La publicación no muestra nombres, escuela ni ubicación.", color:"verde", puntos:0, accion:"🟢 VERDE: podés compartirlo si no aparecen datos personales."},
+    {id:"libro", titulo:"Recomendar un libro, juego o canción", detalle:"Compartís tus gustos sin revelar información privada.", color:"verde", puntos:0, accion:"🟢 VERDE: es una publicación de bajo riesgo si no incluye datos personales."},
+    {id:"cara", titulo:"Publicar una foto de tu cara", detalle:"Las personas pueden reconocerte por la imagen.", color:"amarillo", puntos:1, accion:"🟡 AMARILLO: cuidá quién puede verla y qué otros datos aparecen."},
+    {id:"nombre", titulo:"Mostrar tu nombre completo", detalle:"Puede ayudar a identificarte, sobre todo junto con otros datos.", color:"amarillo", puntos:2, accion:"🟡 AMARILLO: evitá combinarlo con escuela, ubicación o contacto."},
+    {id:"colegio", titulo:"Publicar una foto donde se ve tu colegio o uniforme", detalle:"La imagen permite reconocer dónde estudiás.", color:"rojo", puntos:3, accion:"🔴 ROJO: puede revelar tu escuela y tus rutinas. No publiques esos detalles."},
+    {id:"ubicacion", titulo:"Compartir tu ubicación en tiempo real o mostrar tu casa", detalle:"Otras personas podrían saber dónde estás o encontrarte.", color:"rojo", puntos:3, accion:"🔴 ROJO: no compartas ubicación precisa ni en tiempo real públicamente."},
+    {id:"whatsapp", titulo:"Dejar tu número de WhatsApp en un perfil público", detalle:"Personas desconocidas podrían contactarte directamente.", color:"rojo", puntos:3, accion:"🔴 ROJO: quitá el número de publicaciones públicas y revisá la privacidad."}
+  ];
+  // Mezclar las consignas en cada apertura para que el orden cambie.
+  for (let i = datosPrivacidad.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [datosPrivacidad[i], datosPrivacidad[j]] = [datosPrivacidad[j], datosPrivacidad[i]];
+  }
+  const checklist = $("#privacidadChecklist");
+  const elecciones = {};
+  datosPrivacidad.forEach(d => {
+    const fila=document.createElement("div"); fila.className="q";
+    const txt=document.createElement("span"); txt.className="txt";
+    const strong=document.createElement("strong"); strong.textContent=d.titulo;
+    const desc=document.createElement("div"); desc.className="small muted"; desc.textContent=d.detalle;
+    txt.append(strong,desc);
+    const select=document.createElement("select"); select.id="priv-"+d.id; select.setAttribute("aria-label","Elegí el color para: "+d.titulo);
+    select.style.maxWidth="145px";
+    select.innerHTML='<option value="">Elegí color…</option><option value="verde">🟢 Verde</option><option value="amarillo">🟡 Amarillo</option><option value="rojo">🔴 Rojo</option>';
+    select.addEventListener("change",()=>{$("#privacidadResultado").classList.add("hidden");});
+    fila.append(txt,select); checklist.appendChild(fila);
+  });
+  function analizarPrivacidad(){
+    const respondidas=datosPrivacidad.filter(d=>$("#priv-"+d.id).value);
+    if(!respondidas.length){$("#privacidadTexto").textContent="Elegí un color para cada consigna y después revisá tus respuestas.";$("#privacidadResultado").classList.remove("hidden");return;}
+    const aciertos=respondidas.filter(d=>$("#priv-"+d.id).value===d.color).length;
+    const puntos=respondidas.reduce((sum,d)=>sum+($("#priv-"+d.id).value===d.color?d.puntos:0),0);
+    const max=datosPrivacidad.reduce((sum,d)=>sum+d.puntos,0);
+    let nivel,clase,texto;
+    if(aciertos===respondidas.length){nivel="🟢 ¡Excelente!";clase="lvl-low";texto="¡Muy bien! Identificaste correctamente los niveles de privacidad.";}
+    else if(aciertos>=Math.ceil(respondidas.length/2)){nivel="🟡 ¡Vas aprendiendo!";clase="lvl-mid";texto="Tenés varias respuestas correctas. Revisá las explicaciones para aprender las que faltaron.";}
+    else{nivel="🔴 ¡A practicar!";clase="lvl-high";texto="Probá de nuevo: observá qué información revela cada publicación y cómo podría afectar tu privacidad.";}
+    $("#privacidadNivel").textContent=nivel; $("#privacidadNivel").className="badge "+clase;
+    $("#privacidadTexto").textContent=texto;
+    $("#privacidadPuntaje").textContent="Respuestas correctas: "+aciertos+" de "+respondidas.length+".";
+    const ul=$("#privacidadAcciones"); ul.innerHTML="";
+    datosPrivacidad.forEach(d=>{
+      const li=document.createElement("li");
+      const elegido=$("#priv-"+d.id).value;
+      li.textContent=d.titulo+" — "+(elegido===d.color?"✅ ¡Correcto! ":"❌ Elegiste "+(elegido==="verde"?"verde":elegido==="amarillo"?"amarillo":"rojo")+". ") + d.accion;
+      ul.appendChild(li);
+    });
+    $("#privacidadResultado").classList.remove("hidden");
+    $("#privacidadResultado").scrollIntoView({behavior:"smooth",block:"start"});
+    Store.set("ultimoEscaner",{puntos, total:max, nivel:nivel.split(" · ")[0], fecha:Date.now()}); actualizarResumen();
+  }
+  $("#btnAnalizarPrivacidad").addEventListener("click",analizarPrivacidad);
+  $("#btnLimpiarPrivacidad").addEventListener("click",()=>{datosPrivacidad.forEach(d=>$("#priv-"+d.id).value="");$("#privacidadResultado").classList.add("hidden");});
+  $("#btnVerTutoriales").addEventListener("click",()=>{$("#privacidadTutoriales").scrollIntoView({behavior:"smooth",block:"start"});$("#privacidadTutoriales").querySelectorAll("details").forEach(d=>d.open=true);});
+
+  /* ---------- Resumen y borrado de datos locales ---------- */
+  function actualizarResumen() {
+    const j = Store.get("ultimoJuego", null);
+    const e = Store.get("ultimoEscaner", null);
+    const partes = [];
+    if (j) partes.push(`Último juego: ${j.puntaje}/${j.total} puntos`);
+    if (e) partes.push(`Último escáner: ${e.nivel} (${e.puntos}/${e.total})`);
+    $("#resumenGuardado").textContent = partes.length ? partes.join(" · ") : "Todavía no hiciste ningún juego ni escáner.";
+  }
+
+  $("#btnBorrar").addEventListener("click", () => {
+    if (!confirm("¿Borrar los datos guardados en este navegador?")) return;
+    Store.clear();
+    aplicarTema(false);
+    mostrarInicioJuego();
+    actualizarResumen();
+  });
+
+  /* ---------- Inicialización ---------- */
+  mostrarInicioJuego();
+  renderEscaner();
+  actualizarResumen();
+})();
+</script>
+</body>
+</html>
